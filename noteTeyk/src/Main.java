@@ -76,6 +76,7 @@ public class Main extends NotesFileMgmt {
         //Saved Notes Panel and Components Initialization
         JPanel savedNotesPanel = new JPanel();
         savedNotesPanel.setLayout(new BorderLayout());
+        savedNotesPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         JLabel savedNotesLabel = new JLabel("Saved Notes");
         savedNotesLabel.setBorder(new EmptyBorder(5, 5, 5, 5)); //Padding
 
@@ -89,9 +90,10 @@ public class Main extends NotesFileMgmt {
         savedNotesList = new JList<>(savedNotes);
         savedNotesList.setLayoutOrientation(JList.VERTICAL);
         savedNotesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        savedNotesList.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+        savedNotesList.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         savedNotesList.setFont(new Font("Arial", Font.PLAIN, 15));
         savedNotesList.setFixedCellHeight(25);
+        savedNotesList.setFixedCellWidth(90);
         JScrollPane savedNotesScrollPane = new JScrollPane(savedNotesList);
         savedNotesPanel.add(savedNotesLabel, BorderLayout.NORTH);
         savedNotesPanel.add(savedNotesScrollPane, BorderLayout.CENTER);

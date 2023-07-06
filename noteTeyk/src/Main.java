@@ -86,7 +86,7 @@ public class Main extends NotesFileMgmt {
 //        savedNotes.addElement("Data 02");
 
 
-
+        //Notes List
         savedNotesList = new JList<>(savedNotes);
         savedNotesList.setLayoutOrientation(JList.VERTICAL);
         savedNotesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -107,7 +107,7 @@ public class Main extends NotesFileMgmt {
         };
         savedNotesList.addListSelectionListener(noteListSelection);
 
-
+//        Split Panel
         JSplitPane notesPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         notesPanel.setLeftComponent(savedNotesPanel);
         notesPanel.setRightComponent(notesAreaPane);

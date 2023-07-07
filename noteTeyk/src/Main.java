@@ -60,6 +60,7 @@ public class Main extends NotesFileMgmt {
                         JOptionPane.showMessageDialog(notesFrame, "File created successfully!");
                         savedNotes.addElement(newNoteName);
                         notesTextArea.setText("");
+                        notesTextTitle.setText(newNoteName);
                     } else {
                         int confirmReplace = JOptionPane.showConfirmDialog(notesFrame, "Would you like to replace the file?", "Replace?", JOptionPane.YES_NO_OPTION);
                         if (confirmReplace == JOptionPane.YES_OPTION) {
@@ -72,6 +73,7 @@ public class Main extends NotesFileMgmt {
                                 } else {
                                     savedNotes.addElement(newNoteName);
                                     notesTextArea.setText("");
+                                    notesTextTitle.setText(newNoteName);
                                 }
                             }
                         }

@@ -184,6 +184,7 @@ public class Main extends NotesFileMgmt {
         noteTitleBorder = BorderFactory.createTitledBorder(lineBorder ,"Note name");
         noteTitleBorder.setTitlePosition(TitledBorder.TOP);
         notesTextTitle.setBorder(noteTitleBorder);
+        notesTextTitle.setEditable(false);
         JPanel notesAreaPane = new JPanel();
         notesAreaPane.setLayout(new BorderLayout());
         notesAreaPane.add(notesTextTitle, BorderLayout.NORTH);

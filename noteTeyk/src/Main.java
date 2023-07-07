@@ -6,9 +6,11 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Main extends NotesFileMgmt {
-
+    final static Pattern invalidChars = Pattern.compile("[\\\\/:*?\"<>|]");
     static JFrame notesFrame;
     static JMenuBar notesMenuBar;
     static JTextArea notesTextArea;
@@ -22,7 +24,7 @@ public class Main extends NotesFileMgmt {
         notesFrame.setLayout(new BorderLayout());
         notesFrame.setLocationRelativeTo(null);
 
-        //Buttons Initialization
+        //a. Buttons Initialization
         JButton newButton = new JButton("New");
         newButton.setBackground(Color.white);
         newButton.setFocusable(false);
@@ -41,11 +43,22 @@ public class Main extends NotesFileMgmt {
             public void actionPerformed(ActionEvent event) {
 
                 if (newButton == event.getSource()) {
+                    String newNoteName;
                     System.out.println("New Button is Pressed!"); //Debugging
-                    String newNoteName = JOptionPane.showInputDialog(notesFrame, "Enter a New Name for the New Note");
+                    while(true){
+                        newNoteName = JOptionPane.showInputDialog(notesFrame, "Enter a New Name for the New Note");
+                        Matcher nameMatcher = invalidChars.matcher(newNoteName);
+                        if (nameMatcher.find()){
+                            JOptionPane.showMessageDialog(notesFrame, "Invalid File Name!");
+                        } else {
+                            break;
+                        }
+                    }
+
                     if (ifFileExists(newNoteName)) {
                         JOptionPane.showMessageDialog(notesFrame, "File created successfully!");
                         savedNotes.addElement(newNoteName);
+                        notesTextArea.setText("");
                     } else {
                         int confirmReplace = JOptionPane.showConfirmDialog(notesFrame, "Would you like to replace the file?", "Replace?", JOptionPane.YES_NO_OPTION);
                         if (confirmReplace == JOptionPane.YES_OPTION){
@@ -54,8 +67,10 @@ public class Main extends NotesFileMgmt {
                                 if(savedNotes.contains(newNoteName.toLowerCase())){
                                     savedNotes.removeElement(newNoteName);
                                     savedNotes.addElement(newNoteName);
+                                    notesTextArea.setText("");
                                 }else{
                                     savedNotes.addElement(newNoteName);
+                                    notesTextArea.setText("");
                                 }
                             }
                         }
@@ -87,7 +102,7 @@ public class Main extends NotesFileMgmt {
         openButton.addActionListener(buttonListener);
         deleteButton.addActionListener(buttonListener);
 
-        //Text Area Initialization
+        //b. Text Area Initialization
         notesTextArea = new JTextArea();
         notesTextArea.setText("This is a text");
         notesTextArea.setFont(new Font("Arial", Font.PLAIN, 12));
@@ -97,24 +112,25 @@ public class Main extends NotesFileMgmt {
         notesAreaPane.add(notesTextArea, BorderLayout.CENTER);
 
 
-        //Menu Bar Initialization
+        //c. Menu Bar Initialization
         notesMenuBar = new JMenuBar();
         notesMenuBar.add(newButton);
         notesMenuBar.add(saveButton);
         notesMenuBar.add(openButton);
         notesMenuBar.add(deleteButton);
 
-        //Saved Notes Panel and Components Initialization
+        //d. Saved Notes Panel and Components Initialization
         JPanel savedNotesPanel = new JPanel();
         savedNotesPanel.setLayout(new BorderLayout());
         savedNotesPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         JLabel savedNotesLabel = new JLabel("Saved Notes");
         savedNotesLabel.setBorder(new EmptyBorder(5, 5, 5, 5)); //Padding
 
+        //Saved Notes
         savedNotes = new DefaultListModel<>();
         savedNotes = refreshNotesLists();
 
-        //Notes List
+        //The List
         savedNotesList = new JList<>(savedNotes);
         savedNotesList.setLayoutOrientation(JList.VERTICAL);
         savedNotesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -135,13 +151,13 @@ public class Main extends NotesFileMgmt {
         };
         savedNotesList.addListSelectionListener(noteListSelection);
 
-//        Split Panel
+        //e. Split Panel
         JSplitPane notesPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         notesPanel.setLeftComponent(savedNotesPanel);
         notesPanel.setRightComponent(notesAreaPane);
         notesPanel.setDividerLocation(250);
 
-        //Visibility Initialization
+        //f. Visibility Initialization
         notesFrame.add(notesPanel, BorderLayout.CENTER);
         notesFrame.add(notesMenuBar, BorderLayout.NORTH);
         notesFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

@@ -14,8 +14,9 @@ public class Main extends NotesFileMgmt {
     static JTextArea notesTextArea;
     static JList<String> savedNotesList;
     static DefaultListModel<String> savedNotes;
-    static String noteTitle;
-    public static void initializeUI(){
+    static String selectedNoteTitle;
+
+    public static void initializeUI() {
         notesFrame = new JFrame("Note-taking Application");
         notesFrame.setSize(900, 600);
         notesFrame.setLayout(new BorderLayout());
@@ -31,24 +32,52 @@ public class Main extends NotesFileMgmt {
         JButton openButton = new JButton("Open");
         openButton.setBackground(Color.white);
         openButton.setFocusable(false);
+        JButton deleteButton = new JButton("Delete");
+        deleteButton.setBackground(Color.white);
+        deleteButton.setFocusable(false);
 
         ActionListener buttonListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                if (newButton == event.getSource()){
-                    System.out.println("New Button is Pressed!");
-                    String newNoteName = JOptionPane.showInputDialog(notesFrame, "Enter new note file");
-                    checkFile(newNoteName);
-                    savedNotes.addElement(newNoteName);
+
+                if (newButton == event.getSource()) {
+                    System.out.println("New Button is Pressed!"); //Debugging
+                    String newNoteName = JOptionPane.showInputDialog(notesFrame, "Enter a New Name for the New Note");
+                    if (ifFileExists(newNoteName)) {
+                        JOptionPane.showMessageDialog(notesFrame, "File created successfully!");
+                        savedNotes.addElement(newNoteName);
+                    } else {
+                        int confirmReplace = JOptionPane.showConfirmDialog(notesFrame, "Would you like to replace the file?", "Replace?", JOptionPane.YES_NO_OPTION);
+                        if (confirmReplace == JOptionPane.YES_OPTION){
+                            if(onlyCreateFile(newNoteName)){
+                                JOptionPane.showMessageDialog(notesFrame, "File created successfully!");
+                                if(savedNotes.contains(newNoteName.toLowerCase())){
+                                    savedNotes.removeElement(newNoteName);
+                                    savedNotes.addElement(newNoteName);
+                                }else{
+                                    savedNotes.addElement(newNoteName);
+                                }
+                            }
+                        }
+                    }
 
                 }
-                if (saveButton == event.getSource()){
-                    System.out.println("Save Button is Pressed!");
+
+                if (saveButton == event.getSource()) {
+                    System.out.println("Save Button is Pressed!"); //Debugging
                     String noteContents = String.valueOf(notesTextArea.getText());
-                    saveNotesToFile(noteContents, noteTitle);
+                    saveNotesToFile(noteContents, selectedNoteTitle);
                 }
-                if (openButton == event.getSource()){
-                    System.out.println("Open Button is Pressed!");
+                if (openButton == event.getSource()) {
+                    System.out.println("Open Button is Pressed!"); //Debugging
+                    notesTextArea.setText(readData(selectedNoteTitle));
+                }
+                if (deleteButton == event.getSource()) {
+                    int answer = JOptionPane.showConfirmDialog(notesFrame, "Are you sure you want to delete " + selectedNoteTitle + "?", "Delete File?", JOptionPane.YES_NO_OPTION);
+                    if (answer == JOptionPane.YES_OPTION) {
+                        deleteNoteFile(selectedNoteTitle);
+                        savedNotes.removeElement(selectedNoteTitle);
+                    }
                 }
             }
         };
@@ -56,6 +85,7 @@ public class Main extends NotesFileMgmt {
         newButton.addActionListener(buttonListener);
         saveButton.addActionListener(buttonListener);
         openButton.addActionListener(buttonListener);
+        deleteButton.addActionListener(buttonListener);
 
         //Text Area Initialization
         notesTextArea = new JTextArea();
@@ -72,6 +102,7 @@ public class Main extends NotesFileMgmt {
         notesMenuBar.add(newButton);
         notesMenuBar.add(saveButton);
         notesMenuBar.add(openButton);
+        notesMenuBar.add(deleteButton);
 
         //Saved Notes Panel and Components Initialization
         JPanel savedNotesPanel = new JPanel();
@@ -81,16 +112,13 @@ public class Main extends NotesFileMgmt {
         savedNotesLabel.setBorder(new EmptyBorder(5, 5, 5, 5)); //Padding
 
         savedNotes = new DefaultListModel<>();
-//        for (int i = 0; i < 50; i++)
-//            savedNotes.addElement("Note " + i);
-//        savedNotes.addElement("Data 02");
-
+        savedNotes = refreshNotesLists();
 
         //Notes List
         savedNotesList = new JList<>(savedNotes);
         savedNotesList.setLayoutOrientation(JList.VERTICAL);
         savedNotesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        savedNotesList.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        savedNotesList.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         savedNotesList.setFont(new Font("Arial", Font.PLAIN, 15));
         savedNotesList.setFixedCellHeight(25);
         savedNotesList.setFixedCellWidth(90);
@@ -100,8 +128,8 @@ public class Main extends NotesFileMgmt {
         ListSelectionListener noteListSelection = new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent listEvent) {
-                if (!listEvent.getValueIsAdjusting()){
-                    noteTitle = savedNotesList.getSelectedValue();
+                if (!listEvent.getValueIsAdjusting()) {
+                    selectedNoteTitle = savedNotesList.getSelectedValue();
                 }
             }
         };
@@ -126,7 +154,7 @@ public class Main extends NotesFileMgmt {
     }
 
 
-    private static void saveNotesToFile(String notes, String title){
+    private static void saveNotesToFile(String notes, String title) {
         writeData(notes, title);
         String noteContents = readData(title);
     }

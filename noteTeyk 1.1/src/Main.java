@@ -117,12 +117,9 @@ public class Main extends NotesFileMgmt {
                     } else {
                         JOptionPane.showMessageDialog(notesFrame, "Invalid Title Name To Save for Filename");
                     }
-
                     // Disable the file name text field
                     notesTextTitle.setEditable(false);
                 }
-
-
 
                 //Open Button Action
                 if (openButton == event.getSource()) {
@@ -183,8 +180,8 @@ public class Main extends NotesFileMgmt {
         noteAreaScroll.setBorder(new LineBorder(Color.WHITE, 15));
 
         TitledBorder noteTitleBorder;
-        Border lioneBorder = BorderFactory.createLineBorder(Color.BLACK, 1);
-        noteTitleBorder = BorderFactory.createTitledBorder(lioneBorder ,"Note name");
+        Border lineBorder = BorderFactory.createLineBorder(Color.BLACK, 1);
+        noteTitleBorder = BorderFactory.createTitledBorder(lineBorder ,"Note name");
         noteTitleBorder.setTitlePosition(TitledBorder.TOP);
         notesTextTitle.setBorder(noteTitleBorder);
         JPanel notesAreaPane = new JPanel();

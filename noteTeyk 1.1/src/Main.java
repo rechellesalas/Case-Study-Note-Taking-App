@@ -49,39 +49,56 @@ public class Main extends NotesFileMgmt {
             @Override
             public void actionPerformed(ActionEvent event) {
 
-                //New Button Action
+                 // New Button Action
                 if (newButton == event.getSource()) {
-                    String newNoteName;
-                    while (true) {
-                        newNoteName = JOptionPane.showInputDialog(notesFrame, "Enter a New Name for the New Note");
-                        if (checkIfNameValid(newNoteName)) {
-                            break;
-                        } else {
-                            JOptionPane.showMessageDialog(notesFrame, "Invalid File Name!");
-                        }
-                    }
+                    try {
+                        String newNoteName;
+                        System.out.println("New Button is Pressed!"); // Debugging
 
-                    if (ifFileExists(newNoteName)) {
-                        JOptionPane.showMessageDialog(notesFrame, "File created successfully!");
-                        savedNotes.addElement(newNoteName);
-                        notesTextArea.setText("");
-                        notesTextTitle.setText(newNoteName);
-                    } else {
-                        int confirmReplace = JOptionPane.showConfirmDialog(notesFrame, "Would you like to replace the file?", "Replace the file?", JOptionPane.YES_NO_OPTION);
-
-                        if (confirmReplace == JOptionPane.YES_OPTION) {
-                            if (onlyCreateFile(newNoteName)) {
-                                JOptionPane.showMessageDialog(notesFrame, "File created successfully!");
-                                notesTextArea.setText("");
-                                notesTextTitle.setText(newNoteName);
-
-                                int savedNotesSize = savedNotes.getSize();
-
-                                if (checkIfNameInList(newNoteName, savedNotesSize)) {
-                                    savedNotes.addElement(newNoteName);
+                        boolean validFileName = false;
+                        while (!validFileName) {
+                            newNoteName = JOptionPane.showInputDialog(notesFrame, "Enter a New Name for the New Note");
+                            if (newNoteName != null && !newNoteName.trim().isEmpty()) {
+                                if (checkIfNameValid(newNoteName)) {
+                                    validFileName = true;
+                                    if (ifFileExists(newNoteName)) {
+                                        JOptionPane.showMessageDialog(notesFrame, "File created successfully!");
+                                        savedNotes.addElement(newNoteName);
+                                        notesTextArea.setText("");
+                                        notesTextTitle.setText(newNoteName);
+                                    } else {
+                                        int confirmReplace = JOptionPane.showConfirmDialog(notesFrame, "Would you like to replace the file?", "Replace?", JOptionPane.YES_NO_OPTION);
+                                        if (confirmReplace == JOptionPane.YES_OPTION) {
+                                            if (onlyCreateFile(newNoteName)) {
+                                                JOptionPane.showMessageDialog(notesFrame, "File created successfully!");
+                                                notesTextTitle.setText(newNoteName);
+                                                int savedNotesSize = savedNotes.getSize();
+                                                boolean existsFlag = false;
+                                                for (int i = 0; i < savedNotesSize; i++) {
+                                                    if (savedNotes.elementAt(i).equalsIgnoreCase(newNoteName)) {
+                                                        existsFlag = false;
+                                                        break;
+                                                    } else {
+                                                        existsFlag = true;
+                                                    }
+                                                }
+                                                if (existsFlag) {
+                                                    savedNotes.addElement(newNoteName);
+                                                }
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    JOptionPane.showMessageDialog(notesFrame, "Invalid File Name!");
                                 }
+                            } else {
+                                JOptionPane.showMessageDialog(notesFrame, "Enter a File Name!");
+                                // User canceled or provided an empty file name
+                                break;
                             }
                         }
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(notesFrame, "An error occurred. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
 

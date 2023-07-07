@@ -4,13 +4,13 @@ import java.io.FileWriter;
 import java.util.Scanner;
 
 public class NotesFileMgmt {
-    final static String NOTEPATH = "./notes/";
+    final static String NOTESTORAGEPATH = "./notes/";
     final static String FILEEXTENSION = ".txt";
 
 
     public static String addNotesToPath(String noteName) {
 
-        return NOTEPATH + noteName + FILEEXTENSION;
+        return NOTESTORAGEPATH + noteName + FILEEXTENSION;
     }
 
     public static boolean ifFileExists(String newNoteFile) {
@@ -18,9 +18,9 @@ public class NotesFileMgmt {
         boolean doesExists = true;
         try {
             noteFile = new File(addNotesToPath(newNoteFile));
-            File noteDir = new File(NOTEPATH);
+            File noteDir = new File(NOTESTORAGEPATH);
 
-            //Creates directory for storing the notes if it does not exist.
+            //Creates directory for note storage if it does not exist.
             if (!noteDir.exists())
                 noteDir.mkdirs();
 
@@ -38,65 +38,46 @@ public class NotesFileMgmt {
 
     public static boolean onlyCreateFile(String createNewNoteFile){
         File noteFile;
-        boolean didCreate = true;
+        boolean didItCreateFlag = true;
         try{
             noteFile = new File(addNotesToPath(createNewNoteFile));
             noteFile.delete();
-            didCreate = noteFile.createNewFile();
+            didItCreateFlag = noteFile.createNewFile();
         }catch(Exception exception){
             System.out.println(exception.getMessage());
         }
-        return didCreate;
+        return didItCreateFlag;
     }
 
-    public static void writeDataToNotes(String noteData, String noteName) {
+    public static void writeContentToFile(String noteContents, String noteName) {
         try {
             FileWriter fileWriter = new FileWriter(addNotesToPath(noteName));
-            fileWriter.write(noteData);
+            fileWriter.write(noteContents);
             fileWriter.close();
         } catch (Exception exception) {
             System.out.println(exception.getMessage());
         }
     }
 
-    public static String readData(String selectedNoteName) {
-        StringBuilder mySB = new StringBuilder();
+    public static String readNoteContent(String selectedNoteName) {
+        StringBuilder noteContentSB = new StringBuilder();
         try{
-            File myFile = new File(NOTEPATH+selectedNoteName+FILEEXTENSION);
-            Scanner myScannerReader = new Scanner(myFile);
-            if (myScannerReader.hasNextLine())
-                mySB.append(myScannerReader.nextLine());
-            while(myScannerReader.hasNextLine()){
-                mySB.append("\n");
-                mySB.append(myScannerReader.nextLine());
+            File myFile = new File(NOTESTORAGEPATH +selectedNoteName+FILEEXTENSION);
+            Scanner fileReader = new Scanner(myFile);
+            if (fileReader.hasNextLine())
+                noteContentSB.append(fileReader.nextLine());
+            while(fileReader.hasNextLine()){
+                noteContentSB.append("\n");
+                noteContentSB.append(fileReader.nextLine());
             }
         } catch (Exception exception){
             System.out.println(exception.getMessage());
         }
-        return String.valueOf(mySB);
+        return String.valueOf(noteContentSB);
     }
 
 
-
-//    public static String readData(String selectedNoteName) {
-//        String noteText = "";
-//        try {
-//            File noteFile = new File(addNotesToPath(selectedNoteName));
-//            Scanner fileScanner = new Scanner(noteFile);
-//            if (fileScanner.hasNextLine()) {
-//                String parsedText = "";
-//                while (fileScanner.hasNextLine()) {
-//                    parsedText = parsedText + fileScanner.nextLine(); // This is working, to append text for every loop, but I suggest to use StringBuilder
-//                }
-//                noteText = parsedText;
-//            }
-//        } catch (Exception exception) {
-//            System.out.println(exception.getMessage());
-//        }
-//        return noteText;
-//    }
-
-    public static String deleteNoteFile(String noteFileName) {
+    public static void deleteNoteFile(String noteFileName) {
 
         try {
             File noteFile = new File(addNotesToPath(noteFileName));
@@ -106,19 +87,17 @@ public class NotesFileMgmt {
         } catch (Exception exception) {
             System.out.println(exception.getMessage());
         }
-
-        return "Deleted Successfully";
     }
 
+    //This refreshes the notes list.
     public static DefaultListModel<String> refreshNotesLists(){
         DefaultListModel<String> fileNames = null;
         try{
-            File noteDir = new File(NOTEPATH);
+            File noteDir = new File(NOTESTORAGEPATH);
             fileNames = new DefaultListModel<>();
             File[] noteFiles = noteDir.listFiles();
-            int noteFilesSize = noteFiles.length;
-            for ( int i = 0; i < noteFilesSize; i++) {
-                String resultNames= noteFiles[i].getName().split("\\.")[0].split("\\(")[0];
+            for (File noteFile : noteFiles) {
+                String resultNames = noteFile.getName().split("\\.txt")[0].split("\\(")[0];
                 fileNames.addElement(resultNames);
             }
         }catch(Exception exception){

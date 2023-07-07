@@ -9,7 +9,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Main extends NotesFileMgmt {
-    final static Pattern invalidChars = Pattern.compile("[\\\\/:*?\"<>|]");
     static JFrame notesFrame;
     static JMenuBar notesMenuBar;
     static JTextArea notesTextArea;
@@ -29,15 +28,19 @@ public class Main extends NotesFileMgmt {
         JButton newButton = new JButton("New");
         newButton.setBackground(Color.white);
         newButton.setFocusable(false);
+
         JButton saveButton = new JButton("Save");
         saveButton.setBackground(Color.white);
         saveButton.setFocusable(false);
+
         JButton openButton = new JButton("Open");
         openButton.setBackground(Color.white);
         openButton.setFocusable(false);
+
         JButton deleteButton = new JButton("Delete");
         deleteButton.setBackground(Color.white);
         deleteButton.setFocusable(false);
+
         JButton fontButton = new JButton("Font");
         fontButton.setBackground(Color.white);
         fontButton.setFocusable(false);
@@ -49,7 +52,6 @@ public class Main extends NotesFileMgmt {
                 //New Button Action
                 if (newButton == event.getSource()) {
                     String newNoteName;
-                    System.out.println("New Button is Pressed!"); //Debugging
                     while (true) {
                         newNoteName = JOptionPane.showInputDialog(notesFrame, "Enter a New Name for the New Note");
                         if (checkIfNameValid(newNoteName)) {
@@ -65,22 +67,17 @@ public class Main extends NotesFileMgmt {
                         notesTextArea.setText("");
                         notesTextTitle.setText(newNoteName);
                     } else {
-                        int confirmReplace = JOptionPane.showConfirmDialog(notesFrame, "Would you like to replace the file?", "Replace?", JOptionPane.YES_NO_OPTION);
+                        int confirmReplace = JOptionPane.showConfirmDialog(notesFrame, "Would you like to replace the file?", "Replace the file?", JOptionPane.YES_NO_OPTION);
+
                         if (confirmReplace == JOptionPane.YES_OPTION) {
                             if (onlyCreateFile(newNoteName)) {
                                 JOptionPane.showMessageDialog(notesFrame, "File created successfully!");
+                                notesTextArea.setText("");
                                 notesTextTitle.setText(newNoteName);
+
                                 int savedNotesSize = savedNotes.getSize();
-                                boolean existsFlag = false;
-                                for (int i = 0; i < savedNotesSize; i++) {
-                                    if (savedNotes.elementAt(i).equalsIgnoreCase(newNoteName)) {
-                                        existsFlag = false;
-                                        break;
-                                    } else {
-                                        existsFlag = true;
-                                    }
-                                }
-                                if (existsFlag) {
+
+                                if (checkIfNameInList(newNoteName, savedNotesSize)) {
                                     savedNotes.addElement(newNoteName);
                                 }
                             }
@@ -90,40 +87,23 @@ public class Main extends NotesFileMgmt {
 
                 //Save Button Action
                 if (saveButton == event.getSource()) {
-//                    System.out.println("Save Button is Pressed!"); //Debugging
                     String noteContents = String.valueOf(notesTextArea.getText());
-
-                    while (true) {
-                        if (checkIfNameValid(notesTextTitle.getText())) {
-                            int savedNotesSize = savedNotes.getSize();
-                            boolean existsFlag = false;
-                            for (int i = 0; i < savedNotesSize; i++) {
-                                if (savedNotes.elementAt(i).equalsIgnoreCase(notesTextTitle.getText())) {
-                                    existsFlag = false;
-                                    break;
-                                } else {
-                                    existsFlag = true;
-                                }
-                            }
-                            if (existsFlag) {
-                                savedNotes.addElement(notesTextTitle.getText());
-                            }
-                            saveNotesToFile(noteContents, notesTextTitle.getText());
-                            break;
-                        } else {
-                            JOptionPane.showMessageDialog(notesFrame, "Invalid Title Name To Save for Filename");
-                            break;
+                    if (checkIfNameValid(notesTextTitle.getText())) {
+                        int savedNotesSize = savedNotes.getSize();
+                        if (checkIfNameInList(notesTextTitle.getText(), savedNotesSize)) {
+                            savedNotes.addElement(notesTextTitle.getText());
                         }
+                        JOptionPane.showMessageDialog(notesFrame, "File saved successfully!");
+                        writeContentToFile(noteContents, notesTextTitle.getText());
+                    } else {
+                        JOptionPane.showMessageDialog(notesFrame, "Invalid Title Name To Save for Filename");
                     }
-
-
                 }
 
                 //Open Button Action
                 if (openButton == event.getSource()) {
-                    System.out.println("Open Button is Pressed!"); //Debugging
                     notesTextTitle.setText(selectedNoteTitle);
-                    notesTextArea.setText(readData(selectedNoteTitle));
+                    notesTextArea.setText(readNoteContent(selectedNoteTitle));
                 }
 
                 //Delete Button Action
@@ -136,7 +116,7 @@ public class Main extends NotesFileMgmt {
                 }
 
                 //Font Button
-                if (fontButton == event.getSource()){
+                if (fontButton == event.getSource()) {
                     String changeFontSize = JOptionPane.showInputDialog(notesFrame, "Enter font size", "Set Font Size", JOptionPane.QUESTION_MESSAGE);
                     textFontSize = Integer.parseInt(changeFontSize);
                     notesTextArea.setFont(new Font(Font.DIALOG, Font.PLAIN, textFontSize));
@@ -165,9 +145,10 @@ public class Main extends NotesFileMgmt {
 
         TitledBorder noteTitleBorder;
         Border lioneBorder = BorderFactory.createLineBorder(Color.BLACK, 1);
-        noteTitleBorder = BorderFactory.createTitledBorder(lioneBorder ,"File name");
+        noteTitleBorder = BorderFactory.createTitledBorder(lioneBorder, "File name");
         noteTitleBorder.setTitlePosition(TitledBorder.TOP);
         notesTextTitle.setBorder(noteTitleBorder);
+
         JPanel notesAreaPane = new JPanel();
         notesAreaPane.setLayout(new BorderLayout());
         notesAreaPane.add(notesTextTitle, BorderLayout.NORTH);
@@ -189,11 +170,11 @@ public class Main extends NotesFileMgmt {
         JLabel savedNotesLabel = new JLabel("Saved Notes");
         savedNotesLabel.setBorder(new EmptyBorder(5, 5, 5, 5)); //Padding
 
-        //Saved Notes
+        //d.a. Saved Notes
         savedNotes = new DefaultListModel<>();
         savedNotes = refreshNotesLists();
 
-        //The List
+        //d.b. The List
         savedNotesList = new JList<>(savedNotes);
         savedNotesList.setLayoutOrientation(JList.VERTICAL);
         savedNotesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -204,12 +185,10 @@ public class Main extends NotesFileMgmt {
         JScrollPane savedNotesScrollPane = new JScrollPane(savedNotesList);
         savedNotesPanel.add(savedNotesLabel, BorderLayout.NORTH);
         savedNotesPanel.add(savedNotesScrollPane, BorderLayout.CENTER);
-        ListSelectionListener noteListSelection = new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent listEvent) {
-                if (!listEvent.getValueIsAdjusting()) {
-                    selectedNoteTitle = savedNotesList.getSelectedValue();
-                }
+
+        ListSelectionListener noteListSelection = listEvent -> {
+            if (!listEvent.getValueIsAdjusting()) {
+                selectedNoteTitle = savedNotesList.getSelectedValue();
             }
         };
         savedNotesList.addListSelectionListener(noteListSelection);
@@ -232,24 +211,29 @@ public class Main extends NotesFileMgmt {
 
     }
 
-
-    private static void saveNotesToFile(String notes, String title) {
-        writeDataToNotes(notes, title);
-        String noteContents = readData(title);
-    }
-
     private static boolean checkIfNameValid(String name) {
+        Pattern invalidChars = Pattern.compile("[\\\\/:*?\"<>|]");
         Matcher nameMatcher = invalidChars.matcher(name);
         boolean nameFlag = true;
-        try{
-            if(nameMatcher.find()) {
+        try {
+            if (nameMatcher.find()) {
                 nameFlag = false;
-            } else {
-                nameFlag = true;
             }
-        }catch (Exception exception){
+        } catch (Exception exception) {
             System.out.println(exception.getMessage());
         }
         return nameFlag;
+    }
+
+    private static boolean checkIfNameInList(String targetName, int listSize) {
+        boolean existsFlag = true;
+
+        for (int i = 0; i < listSize; i++) {
+            if (savedNotes.elementAt(i).equalsIgnoreCase(targetName)) {
+                existsFlag = false;
+                break;
+            }
+        }
+        return existsFlag;
     }
 }

@@ -14,6 +14,7 @@ public class Main extends NotesFileMgmt {
     static JFrame notesFrame;
     static JMenuBar notesMenuBar;
     static JTextArea notesTextArea;
+    static JTextArea notesTextTitle;
     static JList<String> savedNotesList;
     static DefaultListModel<String> savedNotes;
     static String selectedNoteTitle;
@@ -45,10 +46,10 @@ public class Main extends NotesFileMgmt {
                 if (newButton == event.getSource()) {
                     String newNoteName;
                     System.out.println("New Button is Pressed!"); //Debugging
-                    while(true){
+                    while (true) {
                         newNoteName = JOptionPane.showInputDialog(notesFrame, "Enter a New Name for the New Note");
                         Matcher nameMatcher = invalidChars.matcher(newNoteName);
-                        if (nameMatcher.find()){
+                        if (nameMatcher.find()) {
                             JOptionPane.showMessageDialog(notesFrame, "Invalid File Name!");
                         } else {
                             break;
@@ -61,14 +62,14 @@ public class Main extends NotesFileMgmt {
                         notesTextArea.setText("");
                     } else {
                         int confirmReplace = JOptionPane.showConfirmDialog(notesFrame, "Would you like to replace the file?", "Replace?", JOptionPane.YES_NO_OPTION);
-                        if (confirmReplace == JOptionPane.YES_OPTION){
-                            if(onlyCreateFile(newNoteName)){
+                        if (confirmReplace == JOptionPane.YES_OPTION) {
+                            if (onlyCreateFile(newNoteName)) {
                                 JOptionPane.showMessageDialog(notesFrame, "File created successfully!");
-                                if(savedNotes.contains(newNoteName.toLowerCase())){
+                                if (savedNotes.contains(newNoteName.toLowerCase())) {
                                     savedNotes.removeElement(newNoteName);
                                     savedNotes.addElement(newNoteName);
                                     notesTextArea.setText("");
-                                }else{
+                                } else {
                                     savedNotes.addElement(newNoteName);
                                     notesTextArea.setText("");
                                 }
@@ -81,10 +82,26 @@ public class Main extends NotesFileMgmt {
                 if (saveButton == event.getSource()) {
                     System.out.println("Save Button is Pressed!"); //Debugging
                     String noteContents = String.valueOf(notesTextArea.getText());
-                    saveNotesToFile(noteContents, selectedNoteTitle);
+                    saveNotesToFile(noteContents, notesTextTitle.getText());
+
+                    int savedNotesSize = savedNotes.getSize();
+                    boolean flag = false;
+                    for (int i = 0; i < savedNotesSize; i++) {
+                        if (savedNotes.elementAt(i).equalsIgnoreCase(notesTextTitle.getText())) {
+                            flag = false;
+                            break;
+                        } else {
+                            flag = true;
+                        }
+                    }
+                    if (flag){
+                        savedNotes.addElement(notesTextTitle.getText());
+                    }
+
                 }
                 if (openButton == event.getSource()) {
                     System.out.println("Open Button is Pressed!"); //Debugging
+                    notesTextTitle.setText(selectedNoteTitle);
                     notesTextArea.setText(readData(selectedNoteTitle));
                 }
                 if (deleteButton == event.getSource()) {
@@ -104,11 +121,13 @@ public class Main extends NotesFileMgmt {
 
         //b. Text Area Initialization
         notesTextArea = new JTextArea();
-        notesTextArea.setText("This is a text");
         notesTextArea.setFont(new Font("Arial", Font.PLAIN, 12));
         notesTextArea.setBorder(new LineBorder(Color.WHITE, 15));
+        notesTextTitle = new JTextArea();
+        notesTextTitle.setFont(new Font("Arial", Font.BOLD, 20));
         JPanel notesAreaPane = new JPanel();
         notesAreaPane.setLayout(new BorderLayout());
+        notesAreaPane.add(notesTextTitle, BorderLayout.NORTH);
         notesAreaPane.add(notesTextArea, BorderLayout.CENTER);
 
 
@@ -171,7 +190,7 @@ public class Main extends NotesFileMgmt {
 
 
     private static void saveNotesToFile(String notes, String title) {
-        writeData(notes, title);
+        writeDataToNotes(notes, title);
         String noteContents = readData(title);
     }
 }

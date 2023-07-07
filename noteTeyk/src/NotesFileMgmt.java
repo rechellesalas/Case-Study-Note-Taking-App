@@ -1,8 +1,6 @@
 import javax.swing.*;
 import java.io.File;
 import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class NotesFileMgmt {
@@ -51,7 +49,7 @@ public class NotesFileMgmt {
         return didCreate;
     }
 
-    public static void writeData(String noteData, String noteName) {
+    public static void writeDataToNotes(String noteData, String noteName) {
         try {
             FileWriter fileWriter = new FileWriter(addNotesToPath(noteName));
             fileWriter.write(noteData);

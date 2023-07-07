@@ -108,10 +108,17 @@ public class Main extends NotesFileMgmt {
 
                 //Delete Button Action
                 if (deleteButton == event.getSource()) {
-                    int answer = JOptionPane.showConfirmDialog(notesFrame, "Are you sure you want to delete " + selectedNoteTitle + "?", "Delete File?", JOptionPane.YES_NO_OPTION);
-                    if (answer == JOptionPane.YES_OPTION) {
-                        deleteNoteFile(selectedNoteTitle);
-                        savedNotes.removeElement(selectedNoteTitle);
+                    try {
+                        if (selectedNoteTitle == null) {
+                            throw new IllegalArgumentException("No file selected.");
+                        }
+                        int answer = JOptionPane.showConfirmDialog(notesFrame, "Are you sure you want to delete " + selectedNoteTitle + "?", "Delete File?", JOptionPane.YES_NO_OPTION);
+                        if (answer == JOptionPane.YES_OPTION) {
+                            deleteNoteFile(selectedNoteTitle);
+                            savedNotes.removeElement(selectedNoteTitle);
+                        }
+                    } catch (IllegalArgumentException e) {
+                        JOptionPane.showMessageDialog(notesFrame, "No file selected.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
 

@@ -30,6 +30,9 @@ public class Main extends NotesFileMgmt {
         newButton.setBackground(Color.white);
         newButton.setBackground(Color.white);
         newButton.setFocusable(false);
+        JButton saveButton = new JButton("Save");
+        saveButton.setBackground(Color.white);
+        saveButton.setFocusable(false);
         JButton openButton = new JButton("Open");
         openButton.setBackground(Color.white);
         openButton.setFocusable(false);
@@ -98,6 +101,29 @@ public class Main extends NotesFileMgmt {
                 }
 
 
+                // Save Button Action
+                if (saveButton == event.getSource()) {
+                    String noteContents = notesTextArea.getText();
+                    String fileName = notesTextTitle.getText();
+
+                    if (checkIfNameValid(fileName)) {
+                        if (savedNotes.contains(fileName)) {
+                            // Save the notes to the existing file
+                            saveNotesToFile(noteContents, fileName);
+                            JOptionPane.showMessageDialog(notesFrame, "File saved successfully!");
+                        } else {
+                            JOptionPane.showMessageDialog(notesFrame, "Invalid File Name!");
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(notesFrame, "Invalid Title Name To Save for Filename");
+                    }
+
+                    // Disable the file name text field
+                    notesTextTitle.setEditable(false);
+                }
+
+
+
                 //Open Button Action
                 if (openButton == event.getSource()) {
                     System.out.println("Open Button is Pressed!"); //Debugging
@@ -139,6 +165,7 @@ public class Main extends NotesFileMgmt {
         };
 
         newButton.addActionListener(buttonListener);
+        saveButton.addActionListener(buttonListener);
         openButton.addActionListener(buttonListener);
         deleteButton.addActionListener(buttonListener);
         fontButton.addActionListener(buttonListener);
@@ -169,6 +196,7 @@ public class Main extends NotesFileMgmt {
         //c. Menu Bar Initialization
         notesMenuBar = new JMenuBar();
         notesMenuBar.add(newButton);
+        notesMenuBar.add(saveButton);
         notesMenuBar.add(openButton);
         notesMenuBar.add(deleteButton);
         notesMenuBar.add(fontButton);
